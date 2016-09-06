@@ -12,7 +12,7 @@
   <body>
     <section class="page-header">
       <h1 class="project-name">Faucet</h1>
-      <h2 class="project-tagline"></h2>
+      <h2 class="project-tagline">Faucet is a production ready SDN Openflow controller for a layer 2/3 switch with support for  MAC learning, VLANs and ACLs</h2>
       <a href="https://github.com/onfsdn/faucet" class="btn">View on GitHub</a>
       <a href="https://github.com/onfsdn/faucet/zipball/master" class="btn">Download .zip</a>
       <a href="https://github.com/onfsdn/faucet/tarball/master" class="btn">Download .tar.gz</a>
@@ -42,8 +42,13 @@
 <li>Port statistics</li>
 <li>ACL support: Rules are added in the order specified. The rule language supports anything the Ryu OpenFlow protocol parser supports (q.v. ofctl to_match()).</li>
 <li>Control unicast flooding by port and by VLAN</li>
-<li>support for IPv4 and IPv6 static routes on both tagged and untagged VLANs</li>
+<li>BGP advertisement of controller IPs and static routes and Quagga support</li>
+<li>Policy based forwarding to offload processing to external systems (Eg 802.1x via hostapd)</li>
+<li>Support for IPv4 and IPv6 static routes on both tagged and untagged VLANs</li>
 <li>Integrated support for InfluxDB/Grafana</li>
+<li>Comprehensive Test suite - tests for all features that can be run against mininet (development) and on hardware; Most tests run in parallel to reduce time.</li>
+<li>Code: Python based, easy readability (PEP8 style), documented, Unit tests for all features</li>
+<li>Installation: Python pip (pip install ryu_faucet), pre-built VM available - <a href="https://susestudio.com/a/ENQFFD/ryu-faucet">https://susestudio.com/a/ENQFFD/ryu-faucet</a>, Makefiles to build Docker images</li>
 </ul>
 
 <h1></h1>
@@ -58,12 +63,21 @@
 In this example,configure an ACL on port 1, default deny, that passes an IPv4 subnet and ARP.
 Following config applies an input ACL to port 1.</p>
 
-<p>Supports any ACL rule that <a href="https://github.com/osrg/ryu/blob/master/ryu/lib/ofctl_v1_3.py">https://github.com/osrg/ryu/blob/master/ryu/lib/ofctl_v1_3.py</a> to_match() supports.
-::</p>
+<p>Supports any ACL rule that <a href="https://github.com/osrg/ryu/blob/master/ryu/lib/ofctl_v1_3.py">https://github.com/osrg/ryu/blob/master/ryu/lib/ofctl_v1_3.py</a> to_match() supports.</p>
 
-<p>1:
-        native_vlan: 2040
-        acl_in: 1</p>
+<p>.. code:: yaml</p>
+
+<hr>
+
+<p>version: 2</p>
+
+<p>dps:
+      test-switch-1:
+          dp_id: 0x000000000001
+          interfaces:
+              1:
+                  native_vlan: 2040
+                  acl_in: 1</p>
 
 <p>vlans:
       2040:
@@ -108,16 +122,101 @@ Following config applies an input ACL to port 1.</p>
 
 <p>A port not explicitly defined in the YAML configuration file will be set down and will drop all packets.</p>
 
+<h2>
+<a id="versions" class="anchor" href="#versions" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Versions</h2>
+
+<p>The Faucet configuration file format occasionally changes to add functionality or accomodate changes inside Faucet. If the <code>version</code> field is not specified in <code>faucet.yaml</code>, the current default value is <code>1</code>.</p>
+
+<p>Version 1 of the Faucet configuration file format does not allow multiple datapaths to be defined. The one datapath configured for this Faucet instance is configured using top level values, a sample of which can be found in <code>faucet.yaml</code>. Previous (1.0 and older) versions of Faucet do not support the <code>version</code> field, so most configuration files in this format should not use it.</p>
+
+<p>This version of the Faucet configuration file format is deprecated and will be removed shortly, so new installations of Faucet should use the version 2 format, documented below.</p>
+
+<p>.. code:: yaml</p>
+
+<hr>
+
+<p>dp_id: 0x000000000001
+  name: "test-switch-1"</p>
+
+<p>interfaces:
+      1:
+          native_vlan: 2040
+          acl_in: 1</p>
+
+<p>vlans:
+      2040:
+          name: "dev VLAN"</p>
+
+<p>acls:
+      1:
+          - rule:
+              nw_dst: "172.0.0.0/8"
+              dl_type: 0x800
+              allow: 1</p>
+
+<pre><code>      - rule:
+          dl_type: 0x0806
+          allow: 1
+
+      - rule:
+          nw_dst: "10.0.0.0/16"
+          dl_type: 0x800
+          allow: 0
+</code></pre>
+
+<p>Version 2 of the Faucet configuration file format adds the <code>version</code> field, and allows multiple datapaths (switches) to be defined in one configuration file using the <code>dps</code> object, with each datapath sharing the <code>vlans</code> and <code>acls</code> objects defined in that file.</p>
+
+<p>.. code:: yaml</p>
+
+<hr>
+
+<p>version: 2</p>
+
+<p>dps:
+      test-switch-1:
+          dp_id: 0x000000000001
+          interfaces:
+              1:
+                  native_vlan: 2040
+                  acl_in: 1
+      test_switch_2:
+          dp_id: 0x000000000002
+          interfaces:
+              1:
+                  native_vlan: 2040
+                  acl_in: 1</p>
+
+<p>vlans:
+      2040:
+          name: "dev VLAN"</p>
+
+<p>acls:
+      1:
+          - rule:
+              nw_dst: "172.0.0.0/8"
+              dl_type: 0x800
+              allow: 1</p>
+
+<pre><code>      - rule:
+          dl_type: 0x0806
+          allow: 1
+
+      - rule:
+          nw_dst: "10.0.0.0/16"
+          dl_type: 0x800
+          allow: 0
+</code></pre>
+
 <h1></h1>
 
 <h1>
 <a id="installation" class="anchor" href="#installation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installation</h1>
 
-<p>Installation automatically installs dependent Python packages [ryu, pyaml, influxdb client] recursively. </p>
+<p>Installation automatically installs dependent Python packages [ryu, pyaml, influxdb client] recursively.</p>
 
 <p>You have run this as <code>root</code> or use <code>sudo</code>
 ::
-  # pip install <a href="https://pypi.python.org/packages/source/r/ryu-faucet/ryu-faucet-0.30.tar.gz">https://pypi.python.org/packages/source/r/ryu-faucet/ryu-faucet-0.30.tar.gz</a>
+  # pip install <a href="https://pypi.python.org/packages/f5/f3/a8c4e72b4218be5aa84378eb57d89cfc8153efdb4df998cd2a0c544a878a/ryu-faucet-1.0.tar.gz">https://pypi.python.org/packages/f5/f3/a8c4e72b4218be5aa84378eb57d89cfc8153efdb4df998cd2a0c544a878a/ryu-faucet-1.0.tar.gz</a>
   # pip show ryu-faucet</p>
 
 <h2>
@@ -140,6 +239,13 @@ Following config applies an input ACL to port 1.</p>
 <h1></h1>
 
 <h1>
+<a id="architecture" class="anchor" href="#architecture" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Architecture</h1>
+
+<p>.. image:: src/docs/faucet_architecture.png</p>
+
+<h1></h1>
+
+<h1>
 <a id="deployment" class="anchor" href="#deployment" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Deployment</h1>
 
 <p>.. image:: src/docs/faucet_deployment.png</p>
@@ -149,6 +255,18 @@ Following config applies an input ACL to port 1.</p>
 
 <p>.. image:: src/docs/images/ONF_Faucet_deploy1.png</p>
 
+<h2>
+<a id="faucet-deployment-around-the-world" class="anchor" href="#faucet-deployment-around-the-world" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Faucet Deployment around the World</h2>
+
+<p><a href="https://www.google.com/maps/d/u/0/viewer?mid=1MZ0M9ZtZOp2yHWS0S-BQH0d3e4s&amp;hl=en">https://www.google.com/maps/d/u/0/viewer?mid=1MZ0M9ZtZOp2yHWS0S-BQH0d3e4s&amp;hl=en</a></p>
+
+<p>.. raw:: html
+  </p><div>
+  
+  </div>
+
+<p>.. embed:: file: <a href="https://www.google.com/maps/d/u/0/viewer?mid=1MZ0M9ZtZOp2yHWS0S-BQH0d3e4s&amp;hl=en">https://www.google.com/maps/d/u/0/viewer?mid=1MZ0M9ZtZOp2yHWS0S-BQH0d3e4s&amp;hl=en</a></p>
+
 <h1></h1>
 
 <h1>
@@ -156,34 +274,25 @@ Following config applies an input ACL to port 1.</p>
 
 <p>::</p>
 
-<pre><code>PACKETS IN       +------------------------+  +-------------------------+
-  |              |                        |  |                         |
-  |              |                        V  |                         V
-  |       +------+--+   +---------+   +----------+   +---------+   +---------+
-  |       |0:VLAN   |   |1:ACL    |   |2:ETH_SRC |   |3:ETH_DST|   |4:FLOOD  |
-  +------&gt;|         +--&gt;|         +--&gt;+          +--&gt;+         |--&gt;+         |
-          |         |   |         |   |          |   |         |   |         |
-          |         |   |         |   |          |   |         |   |         |
-          |         |   |         |   |          |   |         |   |         |
-          |         |   |         |   |          |   |         |   |         |
-          |         |   |         |   |          |   |         |   |         |
-          |         |   |         |   |          |   |         |   |         |
-          |         |   |         |   |          |   |         |   |         |
-          +---------+   +---------+   +-----+----+   +---+-----+   +----+----+
-                                            |            |              |
-                                            |            |              |
-                                            V            |              V
-                                      +----------+       +-------&gt;PACKETS OUT
-                                      |CONTROL   |
-                                      |PLANE     |
-                                      |          |
-                                      |          |
-                                      |          |
-                                      |          |
-                                      |          |
-                                      |          |
-                                      |          |
-                                      +----------+
+<pre><code>PACKETS IN      +-------------------------+ +-------------------------+
+  +             |                         | |                         |
+  |             |                         | |        CONTROLLER       |
+  |             |                         | |            ^            |
+  |             |                         | |       +----+-----+      v
+  |       +-----+----+  +----------+  +---+-+----+  |3:IPv4_FIB|  +---+------+  +----------+
+  |       |0:VLAN    |  |1:ACL     |  |2:ETH_SRC +-&gt;+          +-&gt;+5:ETH_DST |  |6:FLOOD   |
+  +------&gt;+          |  |          |  |          |  |          |  |          |  |          |
+          |          |  |          |  |          |  +----------+  |          |  |          |
+          |          |  |          |  |          |                |          |  |          |
+          |          +-&gt;+          +-&gt;+          +---------------&gt;+          +-&gt;+          |
+          |          |  |          |  |          |                |          |  |          |
+          |          |  |          |  |          |  +----------+  |          |  |          |
+          |          |  |          |  |          |  |4:IPv6_FIB|  |          |  |          |
+          |          |  |          |  |          +-&gt;+          +-&gt;+          |  |          |
+          +----------+  +----------+  +----+-----+  |          |  +------+---+  +--+-------+
+                                           |        +----+-----+         |         |
+                                           v             v               v         v
+                                       CONTROLLER    CONTROLLER          PACKETS OUT
 </code></pre>
 
 <h1></h1>
@@ -202,6 +311,7 @@ Following config applies an input ACL to port 1.</p>
 # export FAUCET_EXCEPTION_LOG=/var/log/faucet/faucet_exception.log
 # export GAUGE_LOG=/var/log/faucet/gauge_exception.log
 # export GAUGE_EXCEPTION_LOG=/var/log/faucet/gauge_exception.log
+# export GAUGE_DB_CONFIG=/etc/ryu/faucet/gauge_db.yaml
 # $EDITOR /etc/ryu/faucet/faucet.yaml
 # ryu-manager --verbose faucet.py
 </code></pre>
@@ -225,6 +335,8 @@ Following config applies an input ACL to port 1.</p>
 <p>Faucet will log to <code>/var/log/faucet/faucet.log</code> and <code>/var/log/faucet/faucet_exception.log</code> by default, this can be changed with the <code>FAUCET_LOG</code> and <code>FAUCET_EXCEPTION_LOG</code> environment variables.</p>
 
 <p>Gauge will log to <code>/var/log/faucet/gauge.log</code> and <code>/var/log/faucet/gauge_exception.log</code> by default, this can be changed with the <code>GAUGE_LOG</code> and <code>GAUGE_EXCEPTION_LOG</code> environment variables.</p>
+
+<p>If running Faucet in <code>virtualenv</code> and without specifying the environment variables above, the default log and configuration locations will change to reflect the virtual environment's prefix path. For example, the default Faucet log location will be <code>&lt;venv prefix&gt;/var/log/faucet/faucet.log</code>. The Gauge configuration must still be updated in this case by modifying <code>&lt;venv prefix&gt;/etc/ryu/faucet/gauge.conf</code> to reflect the location of the configuration file used by Faucet (<code>&lt;venv prefix&gt;/etc/ryu/faucet/faucet.conf</code>). When using <code>virtualenv</code>, also create the log directory at its new location, <code>&lt;venv prefix&gt;/var/log/ryu/faucet</code>, rather than the global <code>/var/log/ryu/faucet</code>.</p>
 
 <p>To tell Faucet to reload its configuration file after you've changed it, simply send it a <code>SIGHUP</code>:</p>
 
@@ -258,9 +370,10 @@ Mininet test actually spins up virtual hosts and a switch, and a test FAUCET con
 
 <pre><code>1. Open vSwitch v2.1+ - Open Source available at http://www.OpenVSwitch.Org
 2. Lagopus Openflow Switch - Open Source available at https://lagopus.github.io/
-3. Allied Telesis x510 and x930 series
-4. NoviFlow 1248
-5. Zodiac FX
+3. Allied Telesis x510 and x930 series - https://www.alliedtelesis.com/products/x930-series
+4. NoviFlow 1248 - http://noviflow.com/products/noviswitch/
+5. Northbound Networks - Zodiac FX - http://northboundnetworks.com/collections/zodiac-fx
+6. HP Enterprise Aruba 3810 - http://www.arubanetworks.com/products/networking/switches/3810-series/
 </code></pre>
 
 <p>Faucet's design principle is to be as hardware agnostic as possible and not require TTPs. That means that Faucet excepts the hardware OFA to hide implementation details, including which tables are best for certain matches or whether there is special support for multicast - Faucet excepts the OFA to leverage the right hardware transparently.</p>
@@ -290,6 +403,11 @@ Mininet test actually spins up virtual hosts and a switch, and a test FAUCET con
 <p><code>NorthBound Networks &lt;http://northboundnetworks.com/&gt;</code></p>
 
 <p>FAUCET supports the Zodiac FX as of v0.60 firmware.</p>
+
+<h2>
+<a id="hp-enterprise" class="anchor" href="#hp-enterprise" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>HP Enterprise</h2>
+
+<p><code>HP Enterprise &lt;http://www.hp.com&gt;</code> and its many distributors and resellers.</p>
 
 <h1></h1>
 
@@ -321,6 +439,10 @@ Mininet test actually spins up virtual hosts and a switch, and a test FAUCET con
 <a id="support" class="anchor" href="#support" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Support</h1>
 
 <p>If you have any technical questions, problems or suggestions regarding Faucet please send them to <code>faucet-dev@OpenflowSDN.Org &lt;mailto:faucet-dev@openflowsdn.org&gt;</code>.  Mailing list archives are available <code>here &lt;https://groups.google.com/a/openflowsdn.org/forum/#!forum/faucet-dev&gt;</code>.</p>
+
+<p>Documentation is available under <code>docs &lt;https://github.com/onfsdn/faucet/tree/master/src/docs&gt;</code> directory.</p>
+
+<p>Faucet related blog by Josh Bailey available at <a href="http://faucet-sdn.blogspot.co.nz/">http://faucet-sdn.blogspot.co.nz/</a></p>
 
 <p>To create a issue, use <code>Github issues &lt;https://github.com/onfsdn/faucet/issues&gt;</code></p>
 
