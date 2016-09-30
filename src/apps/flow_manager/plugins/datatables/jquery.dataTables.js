@@ -634,7 +634,7 @@
 		var th = $(oCol.nTh);
 	
 		// Try to get width information from the DOM. We can't get it from CSS
-		// as we'd need to parse the CSS stylesheet. `width` option can override
+		// as we'd need to parse the CSS stylesheet. `width` option can onf
 		if ( ! oCol.sWidthOrig ) {
 			// Width attribute
 			oCol.sWidthOrig = th.attr('width') || null;
@@ -4943,7 +4943,7 @@
 	/**
 	 * Attempt to load a saved table state
 	 *  @param {object} oSettings dataTables settings object
-	 *  @param {object} oInit DataTables init object so we can override settings
+	 *  @param {object} oInit DataTables init object so we can onf settings
 	 *  @memberof DataTable#oApi
 	 */
 	function _fnLoadState ( settings, oInit )
@@ -5122,7 +5122,7 @@
 	 * Extend objects - very similar to jQuery.extend, but deep copy objects, and
 	 * shallow copy arrays. The reason we need to do this, is that we don't want to
 	 * deep copy array init values (such as aaSorting) since the dev wouldn't be
-	 * able to override them, but we do want to deep copy arrays.
+	 * able to onf them, but we do want to deep copy arrays.
 	 *  @param {object} out Object to extend
 	 *  @param {object} extender Object from which the properties will be applied to
 	 *      out
@@ -9694,7 +9694,7 @@
 		 * As an object, the parameters in the object are passed to
 		 * [jQuery.ajax](http://api.jquery.com/jQuery.ajax/) allowing fine control
 		 * of the Ajax request. DataTables has a number of default parameters which
-		 * you can override using this option. Please refer to the jQuery
+		 * you can onf using this option. Please refer to the jQuery
 		 * documentation for a full description of the options available, although
 		 * the following parameters provide additional options in DataTables or
 		 * require special consideration:

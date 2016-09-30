@@ -1537,7 +1537,7 @@ function $UrlMatcherFactory() {
   function flushTypeQueue() {
     while(typeQueue.length) {
       var type = typeQueue.shift();
-      if (type.pattern) throw new Error("You cannot override a type's .pattern at runtime.");
+      if (type.pattern) throw new Error("You cannot onf a type's .pattern at runtime.");
       angular.extend($types[type.name], injector.invoke(type.def));
     }
   }
@@ -2187,7 +2187,7 @@ function $StateProvider(   $urlRouterProvider,   $urlMatcherFactory) {
       return compositeName ? findState(compositeName[1]) : root;
     },
 
-    // inherit 'data' from parent and override by own values (if any)
+    // inherit 'data' from parent and onf by own values (if any)
     data: function(state) {
       if (state.parent && state.parent.data) {
         state.data = state.self.data = extend({}, state.parent.data, state.data);
@@ -2406,7 +2406,7 @@ function $StateProvider(   $urlRouterProvider,   $urlMatcherFactory) {
    * @methodOf ui.router.state.$stateProvider
    *
    * @description
-   * Allows you to extend (carefully) or override (at your own peril) the 
+   * Allows you to extend (carefully) or onf (at your own peril) the
    * `stateBuilder` object used internally by `$stateProvider`. This can be used 
    * to add custom functionality to ui-router, for example inferring templateUrl 
    * based on the state name.

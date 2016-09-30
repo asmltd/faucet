@@ -9699,7 +9699,7 @@ color.fn = jQuery.extend( color.prototype, {
 				endValue = end[ index ],
 				type = propTypes[ prop.type ] || {};
 
-			// if null, don't override start value
+			// if null, don't onf start value
 			if ( endValue === null ) {
 				return;
 			}
@@ -16436,7 +16436,7 @@ var tooltip = $.widget( "ui.tooltip", {
 			this._on( this.document, {
 				mousemove: position
 			});
-			// trigger once to override element-relative positioning
+			// trigger once to onf element-relative positioning
 			position( event );
 		} else {
 			tooltip.position( $.extend({

@@ -18,7 +18,7 @@
 	 *
 	 * @constructor
 	 * @param {Element} layer The layer to listen on
-	 * @param {Object} [options={}] The options to override the defaults
+	 * @param {Object} [options={}] The options to onf the defaults
 	 */
 	function FastClick(layer, options) {
 		var oldOnClick;
@@ -819,7 +819,7 @@
 	 * Factory method for creating a FastClick object
 	 *
 	 * @param {Element} layer The layer to listen on
-	 * @param {Object} [options={}] The options to override the defaults
+	 * @param {Object} [options={}] The options to onf the defaults
 	 */
 	FastClick.attach = function(layer, options) {
 		return new FastClick(layer, options);

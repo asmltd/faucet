@@ -4106,7 +4106,7 @@ Base.prototype = {
 				/\bbase\b/.test(value)) {
 				// get the underlying method
 				var method = value.valueOf();
-				// override
+				// onf
 				value = function() {
 					var previous = this.base || Base.prototype.base;
 					this.base = ancestor;
@@ -4224,7 +4224,7 @@ wysihtml5.browser = (function() {
   }
 
   return {
-    // Static variable needed, publicly accessible, to be able override it in unit tests
+    // Static variable needed, publicly accessible, to be able onf it in unit tests
     USER_AGENT: userAgent,
 
     /**
@@ -7047,7 +7047,7 @@ wysihtml5.dom.replaceWithChildNodes = function(node) {
     },
 
     /**
-     * Method to unset/override existing variables
+     * Method to unset/onf existing variables
      * @example
      *    // Make cookie unreadable and unwritable
      *    this._unset(document, "cookie", "", true);
@@ -13267,7 +13267,7 @@ wysihtml5.views.View = Base.extend(
     // Browsers that support copied source handling will get a marking of the origin of the copied source (for determinig code cleanup rules on paste)
     // Also copied source is based directly on selection - 
     // (very useful for webkit based browsers where copy will otherwise contain a lot of code and styles based on whatever and not actually in selection).
-    // If falsy value is passed source override is also disabled
+    // If falsy value is passed source onf is also disabled
     copyedFromMarking: '<meta name="copied-from" content="wysihtml5">'
   };
 

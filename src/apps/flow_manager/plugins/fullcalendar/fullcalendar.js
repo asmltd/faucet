@@ -2615,7 +2615,7 @@ var Grid = fc.Grid = RowRenderer.extend({
 
 
 	// Renders the grid into the `el` element.
-	// Subclasses should override and call this super-method when done.
+	// Subclasses should onf and call this super-method when done.
 	render: function() {
 		this.bindHandlers();
 	},
@@ -2665,7 +2665,7 @@ var Grid = fc.Grid = RowRenderer.extend({
 		this.colData = [];
 		this.updateCells();
 
-		// Populate option-derived settings. Look for override first, then compute if necessary.
+		// Populate option-derived settings. Look for onf first, then compute if necessary.
 		this.colHeadFormat = view.opt('columnFormat') || this.computeColHeadFormat();
 		this.eventTimeFormat = view.opt('timeFormat') || this.computeEventTimeFormat();
 		this.displayEventEnd = view.opt('displayEventEnd');
@@ -2950,7 +2950,7 @@ var Grid = fc.Grid = RowRenderer.extend({
 
 	// Given the first and last cells of a selection, returns a range object.
 	// Will return something falsy if the selection is invalid (when outside of selectionConstraint for example).
-	// Subclasses can override and provide additional data in the range object. Will be passed to renderSelection().
+	// Subclasses can onf and provide additional data in the range object. Will be passed to renderSelection().
 	computeSelection: function(firstCell, lastCell) {
 		var dates = [
 			firstCell.start,
@@ -3065,7 +3065,7 @@ var Grid = fc.Grid = RowRenderer.extend({
 	},
 
 
-	fillSegTag: 'div', // subclasses can override
+	fillSegTag: 'div', // subclasses can onf
 
 
 	// Builds the HTML needed for one fill segment. Generic enought o work with different types.
@@ -3490,7 +3490,7 @@ Grid.mixin({
 
 
 	// Given the cell an event drag began, and the cell event was dropped, calculates the new start/end/allDay
-	// values for the event. Subclasses may override and set additional properties to be used by renderDrag.
+	// values for the event. Subclasses may onf and set additional properties to be used by renderDrag.
 	// A falsy returned value indicates an invalid drop.
 	computeEventDrop: function(startCell, endCell, event) {
 		var dragStart = startCell.start;
@@ -3733,7 +3733,7 @@ Grid.mixin({
 
 	// Compute the text that should be displayed on an event's element.
 	// `range` can be the Event object itself, or something range-like, with at least a `start`.
-	// The `timeFormat` options and the grid's default format is used, but `formatStr` can override.
+	// The `timeFormat` options and the grid's default format is used, but `formatStr` can onf.
 	getEventTimeText: function(range, formatStr) {
 
 		formatStr = formatStr || this.eventTimeFormat;
@@ -4465,7 +4465,7 @@ var DayGrid = Grid.extend({
 	------------------------------------------------------------------------------------------------------------------*/
 
 
-	fillSegTag: 'td', // override the default tag name
+	fillSegTag: 'td', // onf the default tag name
 
 
 	// Renders a set of rectangles over the given segments of days.
@@ -6209,7 +6209,7 @@ var View = fc.View = Class.extend({
 
 
 	// Given a single current date, produce information about what range to display.
-	// Subclasses can override. Must return all properties.
+	// Subclasses can onf. Must return all properties.
 	computeRange: function(date) {
 		var intervalDuration = moment.duration(this.opt('duration') || this.constructor.duration || { days: 1 });
 		var intervalUnit = computeIntervalUnit(intervalDuration);
@@ -8472,7 +8472,7 @@ function EventManager(options) { // assumed to be a calendar
 	// If the given event is a recurring event, break it down into an array of individual instances.
 	// If not a recurring event, return an array with the single original event.
 	// If given a falsy input (probably because of a failed buildEventFromInput call), returns an empty array.
-	// HACK: can override the recurring window by providing custom rangeStart/rangeEnd (for businessHours).
+	// HACK: can onf the recurring window by providing custom rangeStart/rangeEnd (for businessHours).
 	function expandEvent(abstractEvent, _rangeStart, _rangeEnd) {
 		var events = [];
 		var dowHash;
@@ -8736,7 +8736,7 @@ function EventManager(options) { // assumed to be a calendar
 
 		if (optionVal) {
 			if (typeof optionVal === 'object') {
-				// option value is an object that can override the default business hours
+				// option value is an object that can onf the default business hours
 				eventInput = $.extend({}, defaultVal, optionVal);
 			}
 			else {

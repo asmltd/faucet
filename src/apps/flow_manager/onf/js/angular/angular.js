@@ -11044,9 +11044,9 @@ var locationPrototype = {
    * as duplicate search parameters in the url.
    *
    * @param {(string|Number|Array<string>|boolean)=} paramValue If `search` is a string or number, then `paramValue`
-   * will override only a single search property.
+   * will onf only a single search property.
    *
-   * If `paramValue` is an array, it will override the property of the `search` component of
+   * If `paramValue` is an array, it will onf the property of the `search` component of
    * `$location` specified via the first argument.
    *
    * If `paramValue` is `null`, the property specified via the first argument will be deleted.
@@ -13669,8 +13669,8 @@ function $RootScopeProvider() {
      * @param {Object.<string, function()>=} providers Map of service factory which need to be
      *                                       provided for the current scope. Defaults to {@link ng}.
      * @param {Object.<string, *>=} instanceCache Provides pre-instantiated services which should
-     *                              append/override services provided by `providers`. This is handy
-     *                              when unit-testing and having the need to override a default
+     *                              append/onf services provided by `providers`. This is handy
+     *                              when unit-testing and having the need to onf a default
      *                              service.
      * @returns {Object} Newly created scope.
      *
@@ -22903,7 +22903,7 @@ var NgModelController = ['$scope', '$exceptionHandler', '$attrs', '$element', '$
    *
    * The default `$isEmpty` function checks whether the value is `undefined`, `''`, `null` or `NaN`.
    *
-   * You can override this for input directives whose concept of being empty is different to the
+   * You can onf this for input directives whose concept of being empty is different to the
    * default. The `checkboxInputType` directive does this because in its case a value of `false`
    * implies empty.
    *

@@ -67,7 +67,7 @@
 			// Boolean - If we should show the scale at all
 			showScale: true,
 
-			// Boolean - If we want to override with a hard coded scale
+			// Boolean - If we want to onf with a hard coded scale
 			scaleOverride: false,
 
 			// ** Required if scaleOverride is true **

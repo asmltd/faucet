@@ -470,7 +470,7 @@ temporary rendered events).
 }
 
 .fc-not-allowed, /* causes a "warning" cursor. applied on body */
-.fc-not-allowed .fc-event { /* to override an event's custom cursor */
+.fc-not-allowed .fc-event { /* to onf an event's custom cursor */
 	cursor: not-allowed;
 }
 
@@ -591,13 +591,13 @@ a.fc-more:hover {
 }
 
 /* the things within each left/right/center section */
-.fc .fc-toolbar > * > * { /* extra precedence to override button border margins */
+.fc .fc-toolbar > * > * { /* extra precedence to onf button border margins */
 	float: left;
 	margin-left: .75em;
 }
 
 /* the first thing within each left/center/right section */
-.fc .fc-toolbar > * > :first-child { /* extra precedence to override button border margins */
+.fc .fc-toolbar > * > :first-child { /* extra precedence to onf button border margins */
 	margin-left: 0;
 }
 	

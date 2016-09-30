@@ -4153,7 +4153,7 @@ extend(SVGElement.prototype, {
 	},
 
 	/**
-	 * VML override private method to update elements based on internal
+	 * VML onf private method to update elements based on internal
 	 * properties based on SVG transform
 	 */
 	htmlUpdateTransform: function () {
@@ -4653,7 +4653,7 @@ VMLElement = {
 	},
 
 	/**
-	 * Add an event listener. VML override for normalizing event parameters.
+	 * Add an event listener. VML onf for normalizing event parameters.
 	 * @param {String} eventType
 	 * @param {Function} handler
 	 */
@@ -5280,7 +5280,7 @@ var VMLRendererExtension = { // inherit SVGRenderer
 	},
 
 	/**
-	 * VML override to create a regular HTML image
+	 * VML onf to create a regular HTML image
 	 * @param {String} src
 	 * @param {Number} x
 	 * @param {Number} y
@@ -5333,7 +5333,7 @@ var VMLRendererExtension = { // inherit SVGRenderer
 	},
 
 	/**
-	 * Symbol definitions that override the parent SVG renderer's symbols
+	 * Symbol definitions that onf the parent SVG renderer's symbols
 	 *
 	 */
 	symbols: {
@@ -12889,7 +12889,7 @@ Series.prototype = {
 			max;
 
 		// If the series data or axes haven't changed, don't go through this. Return false to pass
-		// the message on to override methods like in data grouping.
+		// the message on to onf methods like in data grouping.
 		if (isCartesian && !series.isDirty && !xAxis.isDirty && !series.yAxis.isDirty && !force) {
 			return false;
 		}
@@ -20606,7 +20606,7 @@ Highcharts.Scroller = Scroller;
 
 
 /**
- * For Stock charts, override selection zooming with some special features because
+ * For Stock charts, onf selection zooming with some special features because
  * X axis zooming is already allowed by the Navigator and Range selector.
  */
 wrap(Axis.prototype, 'zoom', function (proceed, newMin, newMax) {

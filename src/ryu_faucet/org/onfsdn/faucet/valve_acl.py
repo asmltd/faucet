@@ -49,7 +49,7 @@ def build_acl_entry(rule_conf, acl_allow_inst, port_num):
                 acl_inst.append(acl_allow_inst)
         else:
             match_dict[attrib] = attrib_value
-    # override in_port always
+    # onf in_port always
     match_dict['in_port'] = port_num
     acl_match = valve_of.match_from_dict(match_dict)
     return acl_match, acl_inst

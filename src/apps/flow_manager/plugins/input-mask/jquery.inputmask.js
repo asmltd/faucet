@@ -1435,8 +1435,8 @@
                 insertMode: true, //insert the input or overwrite the input
                 clearIncomplete: false, //clear the incomplete input on blur
                 aliases: {}, //aliases definitions => see jquery.inputmask.extensions.js
-                onKeyUp: $.noop, //override to implement autocomplete on certain keys for example
-                onKeyDown: $.noop, //override to implement autocomplete on certain keys for example
+                onKeyUp: $.noop, //onf to implement autocomplete on certain keys for example
+                onKeyDown: $.noop, //onf to implement autocomplete on certain keys for example
                 onBeforePaste: undefined, //executes before masking the pasted value to allow preprocessing of the pasted value.  args => pastedValue => return processedValue
                 onUnMask: undefined, //executes after unmasking to allow postprocessing of the unmaskedvalue.  args => maskedValue, unmaskedValue
                 showMaskOnFocus: true, //show the mask-placeholder when the input has focus
