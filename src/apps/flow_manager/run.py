@@ -42,6 +42,7 @@ def auth():
         test = requests.get(
             "http://localhost:5984/" + config.userdb + "/_design/" + config.user_design + "/_view/" + config.user_view)
         user_data = json.loads(test.text)
+        print user_data;
         for i in user_data["rows"]:
             tmp_user = i["value"]["username"]
             tmp_pass = i["value"]["password"]

@@ -2,9 +2,9 @@ dbhost = "http://localhost"
 dbpost = "5984"
 couchdb = dbhost + ":" + dbpost
 
-userdb = "user"
-user_design = "user"
-user_view = "user"
+userdb = "users"
+user_design = "users"
+user_view = "users"
 flowsdb = "flows_bak"
 flows_design = "flows"
 flows_view = "flow"
