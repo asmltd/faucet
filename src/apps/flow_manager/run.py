@@ -1,3 +1,9 @@
+####
+# Python Flask file
+# Last Updated: October 2nd, 2016
+# Developed by Hariharaselvam Balasubramanian
+####
+
 from flask import Flask, render_template, g, redirect, abort, request, Blueprint, session
 from OpenSSL import SSL
 from flask_cors import cross_origin
@@ -25,12 +31,17 @@ def login_required(f):
 
 @app.route('/')
 def show_home():
+    # Default html file launched from home page
+    # Method GET
     return redirect("index.html", code=302)
 
 
 @app.route('/auth', methods=['GET', 'POST', 'OPTIONS'])
 @cross_origin()
 def auth():
+    # Authentication method
+    # Method POST
+    # parameters Username and Password
     output = {}
     username = ''
     password = ''
@@ -66,6 +77,8 @@ def auth():
 @login_required
 @cross_origin()
 def get_all_users():
+    # List out all users of Faucet
+    # Method GET
     output = {}
     tmp_list = []
     flows_url = "http://localhost:5984/" + config.userdb + "/_design/" + config.user_design + "/_view/" + config.user_view
