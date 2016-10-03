@@ -1,8 +1,0 @@
-{
-  "_id" : "_design/users",
-  "views" : {
-    "users" : {
-      "map" : "function(doc){ emit(doc._id, doc)}"
-    }
-  }
-}
