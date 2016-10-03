@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<robot generated="20161003 21:51:31.564" generator="Robot 3.0 (Python 2.7.10 on darwin)">
+<robot generated="20161003 22:08:09.460" generator="Robot 3.0 (Python 2.7.10 on darwin)">
 <suite source="/Users/hariharaselvam/Documents/faucet/src/apps/flow_manager/tests/faucet.robot" id="s1" name="Faucet">
 <test id="s1-t1" name="Login To Flow Manager">
 <kw name="Open Browser" library="Selenium2Library">
@@ -8,20 +8,20 @@
 <arg>${SERVER URL}</arg>
 <arg>${BROWSER}</arg>
 </arguments>
-<msg timestamp="20161003 21:51:32.356" level="INFO">Opening browser 'Firefox' to base url 'http://localhost:5000'</msg>
-<status status="PASS" endtime="20161003 21:52:00.955" starttime="20161003 21:51:32.356"></status>
+<msg timestamp="20161003 22:08:10.222" level="INFO">Opening browser 'Firefox' to base url 'http://localhost:5000'</msg>
+<status status="PASS" endtime="20161003 22:08:35.590" starttime="20161003 22:08:10.221"></status>
 </kw>
 <kw name="Maximize Browser Window" library="Selenium2Library">
 <doc>Maximizes current browser window.</doc>
-<status status="PASS" endtime="20161003 21:52:01.718" starttime="20161003 21:52:00.956"></status>
+<status status="PASS" endtime="20161003 22:08:36.091" starttime="20161003 22:08:35.591"></status>
 </kw>
 <kw name="Title Should Be" library="Selenium2Library">
 <doc>Verifies that current page title equals `title`.</doc>
 <arguments>
 <arg>Faucet Flow Manager | Login</arg>
 </arguments>
-<msg timestamp="20161003 21:52:01.903" level="INFO">Page title is 'Faucet Flow Manager | Login'.</msg>
-<status status="PASS" endtime="20161003 21:52:01.903" starttime="20161003 21:52:01.718"></status>
+<msg timestamp="20161003 22:08:36.162" level="INFO">Page title is 'Faucet Flow Manager | Login'.</msg>
+<status status="PASS" endtime="20161003 22:08:36.162" starttime="20161003 22:08:36.091"></status>
 </kw>
 <kw name="Input Text" library="Selenium2Library">
 <doc>Types the given `text` into text field identified by `locator`.</doc>
@@ -29,8 +29,8 @@
 <arg>username</arg>
 <arg>${USERNAME}</arg>
 </arguments>
-<msg timestamp="20161003 21:52:01.904" level="INFO">Typing text 'testflowmgr@faucetsdn.org' into text field 'username'</msg>
-<status status="PASS" endtime="20161003 21:52:02.627" starttime="20161003 21:52:01.903"></status>
+<msg timestamp="20161003 22:08:36.163" level="INFO">Typing text 'testflowmgr@faucetsdn.org' into text field 'username'</msg>
+<status status="PASS" endtime="20161003 22:08:37.201" starttime="20161003 22:08:36.162"></status>
 </kw>
 <kw name="Input Text" library="Selenium2Library">
 <doc>Types the given `text` into text field identified by `locator`.</doc>
@@ -38,18 +38,18 @@
 <arg>password</arg>
 <arg>${PASSWORD}</arg>
 </arguments>
-<msg timestamp="20161003 21:52:02.628" level="INFO">Typing text 'testflowmgr' into text field 'password'</msg>
-<status status="PASS" endtime="20161003 21:52:02.767" starttime="20161003 21:52:02.628"></status>
+<msg timestamp="20161003 22:08:37.202" level="INFO">Typing text 'testflowmgr' into text field 'password'</msg>
+<status status="PASS" endtime="20161003 22:08:37.319" starttime="20161003 22:08:37.201"></status>
 </kw>
 <kw name="Click Element" library="Selenium2Library">
 <doc>Click element identified by `locator`.</doc>
 <arguments>
 <arg>tag=button</arg>
 </arguments>
-<msg timestamp="20161003 21:52:02.768" level="INFO">Clicking element 'tag=button'.</msg>
-<status status="PASS" endtime="20161003 21:52:03.074" starttime="20161003 21:52:02.768"></status>
+<msg timestamp="20161003 22:08:37.320" level="INFO">Clicking element 'tag=button'.</msg>
+<status status="PASS" endtime="20161003 22:08:37.719" starttime="20161003 22:08:37.319"></status>
 </kw>
-<status status="PASS" endtime="20161003 21:52:03.074" critical="yes" starttime="20161003 21:51:32.355"></status>
+<status status="PASS" endtime="20161003 22:08:37.719" critical="yes" starttime="20161003 22:08:10.220"></status>
 </test>
 <test id="s1-t2" name="Test Login">
 <kw name="Sleep" library="BuiltIn">
@@ -57,18 +57,18 @@
 <arguments>
 <arg>5s</arg>
 </arguments>
-<msg timestamp="20161003 21:52:08.078" level="INFO">Slept 5 seconds</msg>
-<status status="PASS" endtime="20161003 21:52:08.079" starttime="20161003 21:52:03.077"></status>
+<msg timestamp="20161003 22:08:42.723" level="INFO">Slept 5 seconds</msg>
+<status status="PASS" endtime="20161003 22:08:42.723" starttime="20161003 22:08:37.722"></status>
 </kw>
 <kw name="Page Should Contain" library="Selenium2Library">
 <doc>Verifies that current page contains `text`.</doc>
 <arguments>
 <arg>${USERNAME}</arg>
 </arguments>
-<msg timestamp="20161003 21:52:08.147" level="INFO">Current page contains text 'testflowmgr@faucetsdn.org'.</msg>
-<status status="PASS" endtime="20161003 21:52:08.147" starttime="20161003 21:52:08.079"></status>
+<msg timestamp="20161003 22:08:43.146" level="INFO">Current page contains text 'testflowmgr@faucetsdn.org'.</msg>
+<status status="PASS" endtime="20161003 22:08:43.146" starttime="20161003 22:08:42.723"></status>
 </kw>
-<status status="PASS" endtime="20161003 21:52:08.147" critical="yes" starttime="20161003 21:52:03.076"></status>
+<status status="PASS" endtime="20161003 22:08:43.146" critical="yes" starttime="20161003 22:08:37.720"></status>
 </test>
 <test id="s1-t3" name="Logout From Flow Manager">
 <kw name="Click Element" library="Selenium2Library">
@@ -76,22 +76,22 @@
 <arguments>
 <arg>partial link = ${USERNAME}</arg>
 </arguments>
-<msg timestamp="20161003 21:52:08.149" level="INFO">Clicking element 'partial link = testflowmgr@faucetsdn.org'.</msg>
-<status status="PASS" endtime="20161003 21:52:08.385" starttime="20161003 21:52:08.149"></status>
+<msg timestamp="20161003 22:08:43.148" level="INFO">Clicking element 'partial link = testflowmgr@faucetsdn.org'.</msg>
+<status status="PASS" endtime="20161003 22:08:43.491" starttime="20161003 22:08:43.148"></status>
 </kw>
 <kw name="Click Element" library="Selenium2Library">
 <doc>Click element identified by `locator`.</doc>
 <arguments>
 <arg>link = Sign out</arg>
 </arguments>
-<msg timestamp="20161003 21:52:08.386" level="INFO">Clicking element 'link = Sign out'.</msg>
-<status status="PASS" endtime="20161003 21:52:08.616" starttime="20161003 21:52:08.386"></status>
+<msg timestamp="20161003 22:08:43.492" level="INFO">Clicking element 'link = Sign out'.</msg>
+<status status="PASS" endtime="20161003 22:08:43.751" starttime="20161003 22:08:43.492"></status>
 </kw>
 <kw type="teardown" name="Close Browser" library="Selenium2Library">
 <doc>Closes the current browser.</doc>
-<status status="PASS" endtime="20161003 21:52:09.002" starttime="20161003 21:52:08.616"></status>
+<status status="PASS" endtime="20161003 22:08:44.018" starttime="20161003 22:08:43.752"></status>
 </kw>
-<status status="PASS" endtime="20161003 21:52:09.003" critical="yes" starttime="20161003 21:52:08.148"></status>
+<status status="PASS" endtime="20161003 22:08:44.018" critical="yes" starttime="20161003 22:08:43.147"></status>
 </test>
 <doc>Flow Manager UI
 
@@ -99,7 +99,7 @@ Python RobotFramework with Selenium 2 Library
 Create By Hariharaselvam Balasubramanian
 Email : hbalasubramanian@asmltd.com
 How to Run</doc>
-<status status="PASS" endtime="20161003 21:52:09.005" starttime="20161003 21:51:31.568"></status>
+<status status="PASS" endtime="20161003 22:08:44.020" starttime="20161003 22:08:09.462"></status>
 </suite>
 <statistics>
 <total>
