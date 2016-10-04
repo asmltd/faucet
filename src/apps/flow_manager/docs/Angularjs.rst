@@ -9,7 +9,7 @@ AngularJS:
 AngularJS extends HTML attributes with Directives, and binds data to HTML with Expressions.
 
 AngularJS Extends HTML
-    AngularJS extends HTML with ng-directives.
+    AngularJS extends HTML with ng-directives:
 
     1. The ng-app directive defines an AngularJS application.
 
