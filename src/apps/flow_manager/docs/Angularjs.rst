@@ -1,9 +1,13 @@
-Faucet Flow Manager UI
+**Faucet Flow Manager UI**
+
 Documentation for AngularJS
+
 Date: October 4th, 2016
+
 Author: Hariharaselvam Balasubramanian
 
-AngularJS:
+
+*AngularJS:*
 
     AngularJS is a JavaScript framework. It can be added to an HTML page with a <script> tag.
 AngularJS extends HTML attributes with Directives, and binds data to HTML with Expressions.
@@ -11,16 +15,16 @@ AngularJS extends HTML attributes with Directives, and binds data to HTML with E
 AngularJS Extends HTML
     AngularJS extends HTML with ng-directives:
 
-    1. The ng-app directive defines an AngularJS application.
+    * The ``ng-app`` directive defines an AngularJS application.
 
-    2. The ng-model directive binds the value of HTML controls (input, select, textarea) to application data.
+    * The ``ng-model`` directive binds the value of HTML controls (input, select, textarea) to application data.
 
-    3. The ng-bind directive binds application data to the HTML view.
+    * The ``ng-bind`` directive binds application data to the HTML view.
 
-    4. The ng-controller directive defines the controller.
+    * The ``ng-controller`` directive defines the controller.
 
 
-AngularJS at Faucet Flow Manager UI:
+*AngularJS at Faucet Flow Manager UI:*
 
     * AngularJS Version           : 1.3.15
     * Application name            : FAUCET
