@@ -1,4 +1,4 @@
-window.appName = 'SDN';
+window.appName = 'FAUCET';
 
 //window[appName] = angular.module(appName, ['ui.router','ngValidator','highcharts-ng','ngSanitize','angularUtils.directives.dirPagination']);
 

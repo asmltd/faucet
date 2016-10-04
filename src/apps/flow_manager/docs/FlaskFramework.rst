@@ -1,5 +1,5 @@
 Faucet Flow Manager UI
-Documentation
+Documentation for Flask Framework
 Date: October 4th, 2016
 Author: Hariharaselvam Balasubramanian
 
@@ -31,8 +31,8 @@ REST messages often accepts the form either in form of XML, or JavaScript Object
 
 In Faucet Flow Manager UI run.py is the flask code it contains following endpoints and annotations:
 Annotations:
-    1. Cross Origin
-    2. Login Required
+    1. Cross Origin ( in-build from flask cors origin library )
+    2. Login Required ( created at this project )
 
 Endpoints:
     1. home
