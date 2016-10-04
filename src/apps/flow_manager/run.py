@@ -4,7 +4,7 @@
 # Developed by Hariharaselvam Balasubramanian
 ####
 
-from flask import Flask, render_template, g, redirect, abort, request, Blueprint, session
+from flask import Flask, redirect, abort, request, session
 from OpenSSL import SSL
 from flask_cors import cross_origin
 from functools import wraps
@@ -264,4 +264,4 @@ def logout():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host="0.0.0.0")
+    app.run(debug=True, host=config.flask_host,port=config.flask_port)
