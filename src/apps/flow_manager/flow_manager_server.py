@@ -5,8 +5,6 @@
 ####
 
 from flask import Flask, redirect, abort, request, session
-from OpenSSL import SSL
-from flask_cors import cross_origin
 from functools import wraps
 import json
 import config
@@ -37,7 +35,6 @@ def show_home():
 
 
 @app.route('/auth', methods=['GET', 'POST', 'OPTIONS'])
-@cross_origin()
 def auth():
     # Authentication method
     # Method POST
@@ -51,7 +48,7 @@ def auth():
         password = request.form['password']
         # login_url = rest_url + "user/_all_docs"
         test = requests.get(
-            "http://localhost:5984/" + config.userdb + "/_design/" + config.user_design + "/_view/" + config.user_view)
+            config.couch_db_url + config.userdb + "/_design/" + config.user_design + "/_view/" + config.user_view)
         user_data = json.loads(test.text)
         print user_data;
         for i in user_data["rows"]:
@@ -75,13 +72,12 @@ def auth():
 
 @app.route('/get_all_users', methods=['GET', 'POST', 'OPTIONS'])
 @login_required
-@cross_origin()
 def get_all_users():
     # List out all users of Faucet
     # Method GET
     output = {}
     tmp_list = []
-    flows_url = "http://localhost:5984/" + config.userdb + "/_design/" + config.user_design + "/_view/" + config.user_view
+    flows_url = config.couch_db_url + config.userdb + "/_design/" + config.user_design + "/_view/" + config.user_view
     r = requests.get(flows_url)
     flow_info = json.loads(r.text)
     return json.dumps(flow_info)
@@ -89,11 +85,10 @@ def get_all_users():
 
 @app.route('/get_toplogy', methods=['GET', 'POST', 'OPTIONS'])
 @login_required
-@cross_origin()
 def get_topology():
     output = {}
     tmp_list = []
-    flows_url = "http://localhost:5984/" + config.flowsdb + "/_design/" + config.flows_design + "/_view/" + config.flows_view
+    flows_url = config.couch_db_url + config.flowsdb + "/_design/" + config.flows_design + "/_view/" + config.flows_view
     r = requests.get(flows_url)
     flow_info = json.loads(r.text)
     return json.dumps(flow_info)
@@ -101,7 +96,6 @@ def get_topology():
 
 @app.route('/get_switch_info', methods=['GET', 'POST', 'OPTIONS'])
 @login_required
-@cross_origin()
 def get_switch_info():
     output = {}
     tmp_list = []
@@ -113,7 +107,7 @@ def get_switch_info():
         page_size = json_data.get("size", 10)
     start = page_size * page
     start = start + 1
-    flows_url = "http://localhost:5984/" + config.flowsdb + "/_design/" + config.flows_design + "/_view/" + config.flows_view + "?skip=" + str(
+    flows_url = config.couch_db_url + config.flowsdb + "/_design/" + config.flows_design + "/_view/" + config.flows_view + "?skip=" + str(
         start) + "&limit=" + str(
         page_size)
     print flows_url
@@ -124,11 +118,10 @@ def get_switch_info():
 
 @app.route('/get_switch', methods=['GET', 'POST', 'OPTIONS'])
 @login_required
-@cross_origin()
 def get_switch():
     output = {}
     tmp_list = []
-    flows_url = "http://localhost:5984/" + config.switches + "/_all_docs"
+    flows_url = config.couch_db_url + config.switches + "/_all_docs"
     r = requests.get(flows_url)
     flow_info = json.loads(r.text)
     return json.dumps(flow_info)
@@ -136,14 +129,13 @@ def get_switch():
 
 @app.route('/add_flow', methods=['GET', 'POST', 'OPTIONS'])
 @login_required
-@cross_origin()
 def add_flow():
     output = {}
     if request.method == 'POST':
         json_data = request.get_json()
         print json_data
         role = json_data.get("role", "")
-        url = "http://localhost:5984/" + config.flowsdb + "/"
+        url = config.couch_db_url + config.flowsdb + "/"
         r = requests.post(url, json=json_data)
         info = json.loads(r.text)
         return json.dumps(info)
@@ -151,7 +143,6 @@ def add_flow():
 
 @app.route('/update_flow', methods=['GET', 'POST', 'OPTIONS'])
 @login_required
-@cross_origin()
 def update_flow():
     output = {}
     if request.method == 'POST':
@@ -161,7 +152,7 @@ def update_flow():
         rev = json_data.get("_rev", "")
         print json_data
 
-        up_id = "http://localhost:5984/" + config.flowsdb + "/" + id + "?rev=" + rev
+        up_id = config.couch_db_url + config.flowsdb + "/" + id + "?rev=" + rev
         r = requests.put(up_id, json=json_data)
         info = json.loads(r.text)
         return json.dumps(info)
@@ -169,14 +160,13 @@ def update_flow():
 
 @app.route('/delete_flow', methods=['GET', 'POST', 'OPTIONS'])
 @login_required
-@cross_origin()
 def delete_flow():
     output = {}
     if request.method == 'POST':
         json_data = request.get_json()
         id = json_data.get("id", "")
         rev = json_data.get("rev", "")
-        del_id = "http://localhost:5984/" + config.flowsdb + "/" + id + "?rev=" + rev
+        del_id = config.couch_db_url + config.flowsdb + "/" + id + "?rev=" + rev
         r = requests.delete(del_id)
         flow_info = json.loads(r.text)
         return json.dumps(flow_info)
@@ -184,14 +174,13 @@ def delete_flow():
 
 @app.route('/delete_user', methods=['GET', 'POST', 'OPTIONS'])
 @login_required
-@cross_origin()
 def delete_user():
     output = {}
     if request.method == 'POST':
         json_data = request.get_json()
         id = json_data.get("id", "")
         rev = json_data.get("rev", "")
-        del_id = "http://localhost:5984/" + config.userdb + "/" + id + "?rev=" + rev
+        del_id = config.couch_db_url + config.userdb + "/" + id + "?rev=" + rev
         r = requests.delete(del_id)
         flow_info = json.loads(r.text)
         return json.dumps(flow_info)
@@ -199,11 +188,10 @@ def delete_user():
 
 @app.route('/get_all_flows', methods=['GET', 'POST', 'OPTIONS'])
 @login_required
-@cross_origin()
 def get_all_flows():
     output = {}
     tmp_list = []
-    flows_url = "http://localhost:5984/" + config.flowsdb + "/_all_docs"
+    flows_url = config.couch_db_url + config.flowsdb + "/_all_docs"
     r = requests.get(flows_url)
     flow_info = json.loads(r.text)
     return json.dumps(flow_info)
@@ -211,12 +199,11 @@ def get_all_flows():
 
 @app.route('/get_flow_info', methods=['GET', 'POST', 'OPTIONS'])
 @login_required
-@cross_origin()
 def get_flow_info():
     if request.method == 'POST':
         json_data = request.get_json()
         flow_id = json_data.get("flow_id", "")
-        url = "http://localhost:5984/" + config.flowsdb + "/" + flow_id
+        url = config.couch_db_url + config.flowsdb + "/" + flow_id
         print url
         r = requests.get(url)
         info = json.loads(r.text)
@@ -225,7 +212,6 @@ def get_flow_info():
 
 @app.route('/register_user', methods=['GET', 'POST', 'OPTIONS'])
 @login_required
-@cross_origin()
 def register_user():
     output = {}
     if request.method == 'POST':
@@ -233,14 +219,13 @@ def register_user():
         username = json_data.get("username", "")
         password = json_data.get("password", "")
         role = json_data.get("role", "")
-        url = "http://localhost:5984/" + config.userdb + "/"
+        url = config.couch_db_url + config.userdb + "/"
         r = requests.post(url, json={"username": username, "password": password, "role": role})
         info = json.loads(r.text)
         return json.dumps(info)
 
 
 @app.route('/check_session_data', methods=['GET', 'POST', 'OPTIONS'])
-@cross_origin()
 def check_session_data():
     try:
         if (session['uid'] != ""):
@@ -254,7 +239,6 @@ def check_session_data():
 
 @app.route('/logout', methods=['GET', 'POST', 'OPTIONS'])
 @login_required
-@cross_origin()
 def logout():
     session['username'] = None
     session.clear()
@@ -264,4 +248,4 @@ def logout():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host=config.flask_host,port=config.flask_port)
+    app.run(debug=True, host=config.flask_host, port=config.flask_port)

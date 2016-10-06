@@ -1,0 +1,574 @@
+faucet_configs:
+    - '/etc/ryu/faucet/faucet.yaml'
+watchers:
+    port_stats_poller:
+        type: 'port_stats'
+        dps: ['windscale-faucet-1']
+        interval: 10
+        db: 'influx'
+    flow_table_poller:
+        type: 'flow_table'
+        dps: ['windscale-faucet-1']
+        interval: 40
+        db: 'couchdb'
+dbs:
+    influx:
+        type: 'influx'
+        influx_db: 'faucet'
+        influx_host: 'localhost'
+        influx_port: 8086
+        influx_user: 'faucet'
+        influx_pwd: ''
+        influx_timeout: 10
+    couchdb:
+        type: gaugedb
+        gdb_type: nosql
+        nosql_db: couch
+        db_username: couch
+        db_password: 123
+        #db_ip: 'localhost'
+        db_ip: '10.10.22.7'
+        db_port: 5984
+        driver: 'couchdb'
+        views:
+            switch_view: '_design/switches/_view/switch'
+            match_view: '_design/flows/_view/match'
+            tag_view: '_design/tags/_view/tags'
+        switches_doc: 'switches_bak'
+        flows_doc: 'flows_bak'
+        db_update_counter: 2
+
+
+faucet_configs:
+    - '/etc/ryu/faucet/faucet.yaml'
+watchers:
+    port_stats_poller:
+        type: 'port_stats'
+        dps: ['windscale-faucet-1']
+        interval: 10
+        db: 'influx'
+    flow_table_poller:
+        type: 'flow_table'
+        dps: ['windscale-faucet-1']
+        interval: 40
+        db: 'couchdb'
+dbs:
+    influx:
+        type: 'influx'
+        influx_db: 'faucet'
+        influx_host: 'localhost'
+        influx_port: 8086
+        influx_user: 'faucet'
+        influx_pwd: ''
+        influx_timeout: 10
+    couchdb:
+        type: gaugedb
+        gdb_type: nosql
+        nosql_db: couch
+        db_username: couch
+        db_password: 123
+        #db_ip: 'localhost'
+        db_ip: '10.10.22.7'
+        db_port: 5984
+        driver: 'couchdb'
+        views:
+            switch_view: '_design/switches/_view/switch'
+            match_view: '_design/flows/_view/match'
+            tag_view: '_design/tags/_view/tags'
+        switches_doc: 'switches_bak'
+        flows_doc: 'flows_bak'
+        db_update_counter: 2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+faucet_configs:
+    - '/etc/ryu/faucet/faucet.yaml'
+watchers:
+    port_stats_poller:
+        type: 'port_stats'
+        dps: ['windscale-faucet-1']
+        interval: 10
+        db: 'influx'
+    flow_table_poller:
+        type: 'flow_table'
+        dps: ['windscale-faucet-1']
+        interval: 40
+        db: 'couchdb'
+dbs:
+    influx:
+        type: 'influx'
+        influx_db: 'faucet'
+        influx_host: 'localhost'
+        influx_port: 8086
+        influx_user: 'faucet'
+        influx_pwd: ''
+        influx_timeout: 10
+    couchdb:
+        type: gaugedb
+        gdb_type: nosql
+        nosql_db: couch
+        db_username: couch
+        db_password: 123
+        #db_ip: 'localhost'
+        db_ip: '10.10.22.7'
+        db_port: 5984
+        driver: 'couchdb'
+        views:
+            switch_view: '_design/switches/_view/switch'
+            match_view: '_design/flows/_view/match'
+            tag_view: '_design/tags/_view/tags'
+        switches_doc: 'switches_bak'
+        flows_doc: 'flows_bak'
+        db_update_counter: 2
+
+
+faucet_configs:
+    - '/etc/ryu/faucet/faucet.yaml'
+watchers:
+    port_stats_poller:
+        type: 'port_stats'
+        dps: ['windscale-faucet-1']
+        interval: 10
+        db: 'influx'
+    flow_table_poller:
+        type: 'flow_table'
+        dps: ['windscale-faucet-1']
+        interval: 40
+        db: 'couchdb'
+dbs:
+    influx:
+        type: 'influx'
+        influx_db: 'faucet'
+        influx_host: 'localhost'
+        influx_port: 8086
+        influx_user: 'faucet'
+        influx_pwd: ''
+        influx_timeout: 10
+    couchdb:
+        type: gaugedb
+        gdb_type: nosql
+        nosql_db: couch
+        db_username: couch
+        db_password: 123
+        #db_ip: 'localhost'
+        db_ip: '10.10.22.7'
+        db_port: 5984
+        driver: 'couchdb'
+        views:
+            switch_view: '_design/switches/_view/switch'
+            match_view: '_design/flows/_view/match'
+            tag_view: '_design/tags/_view/tags'
+        switches_doc: 'switches_bak'
+        flows_doc: 'flows_bak'
+        db_update_counter: 2
+
+
+faucet_configs:
+    - '/etc/ryu/faucet/faucet.yaml'
+watchers:
+    port_stats_poller:
+        type: 'port_stats'
+        dps: ['windscale-faucet-1']
+        interval: 10
+        db: 'influx'
+    flow_table_poller:
+        type: 'flow_table'
+        dps: ['windscale-faucet-1']
+        interval: 40
+        db: 'couchdb'
+dbs:
+    influx:
+        type: 'influx'
+        influx_db: 'faucet'
+        influx_host: 'localhost'
+        influx_port: 8086
+        influx_user: 'faucet'
+        influx_pwd: ''
+        influx_timeout: 10
+    couchdb:
+        type: gaugedb
+        gdb_type: nosql
+        nosql_db: couch
+        db_username: couch
+        db_password: 123
+        #db_ip: 'localhost'
+        db_ip: '10.10.22.7'
+        db_port: 5984
+        driver: 'couchdb'
+        views:
+            switch_view: '_design/switches/_view/switch'
+            match_view: '_design/flows/_view/match'
+            tag_view: '_design/tags/_view/tags'
+        switches_doc: 'switches_bak'
+        flows_doc: 'flows_bak'
+        db_update_counter: 2
+
+
+0
+faucet_configs:
+4
+    - '/etc/ryu/faucet/faucet.yaml'
+0
+watchers:
+4
+    port_stats_poller:
+8
+        type: 'port_stats'
+8
+        dps: ['windscale-faucet-1']
+8
+        interval: 10
+8
+        db: 'influx'
+4
+    flow_table_poller:
+8
+        type: 'flow_table'
+8
+        dps: ['windscale-faucet-1']
+8
+        interval: 40
+8
+        db: 'couchdb'
+0
+dbs:
+4
+    influx:
+8
+        type: 'influx'
+8
+        influx_db: 'faucet'
+8
+        influx_host: 'localhost'
+8
+        influx_port: 8086
+8
+        influx_user: 'faucet'
+8
+        influx_pwd: ''
+8
+        influx_timeout: 10
+4
+    couchdb:
+8
+        type: gaugedb
+8
+        gdb_type: nosql
+8
+        nosql_db: couch
+8
+        db_username: couch
+8
+        db_password: 123
+8
+        #db_ip: 'localhost'
+8
+        db_ip: '10.10.22.7'
+8
+        db_port: 5984
+8
+        driver: 'couchdb'
+8
+        views:
+12
+            switch_view: '_design/switches/_view/switch'
+12
+            match_view: '_design/flows/_view/match'
+12
+            tag_view: '_design/tags/_view/tags'
+8
+        switches_doc: 'switches_bak'
+8
+        flows_doc: 'flows_bak'
+8
+        db_update_counter: 2
+0
+
+0
+
+0
+faucet_configs:
+0
+    - '/etc/ryu/faucet/faucet.yaml'
+0
+watchers:
+0
+    port_stats_poller:
+0
+        type: 'port_stats'
+0
+        dps: ['windscale-faucet-1']
+0
+        interval: 10
+0
+        db: 'influx'
+0
+    flow_table_poller:
+0
+        type: 'flow_table'
+0
+        dps: ['windscale-faucet-1']
+0
+        interval: 40
+0
+        db: 'couchdb'
+0
+dbs:
+0
+    influx:
+0
+        type: 'influx'
+0
+        influx_db: 'faucet'
+0
+        influx_host: 'localhost'
+0
+        influx_port: 8086
+0
+        influx_user: 'faucet'
+0
+        influx_pwd: ''
+0
+        influx_timeout: 10
+0
+    couchdb:
+0
+        type: gaugedb
+0
+        gdb_type: nosql
+0
+        nosql_db: couch
+0
+        db_username: couch
+0
+        db_password: 123
+0
+        #db_ip: 'localhost'
+0
+        db_ip: '10.10.22.7'
+0
+        db_port: 5984
+0
+        driver: 'couchdb'
+0
+        views:
+0
+            switch_view: '_design/switches/_view/switch'
+0
+            match_view: '_design/flows/_view/match'
+0
+            tag_view: '_design/tags/_view/tags'
+0
+        switches_doc: 'switches_bak'
+0
+        flows_doc: 'flows_bak'
+0
+        db_update_counter: 2
+0
+
+0
+
+0
+faucet_configs:
+4
+    - '/etc/ryu/faucet/faucet.yaml'
+0
+watchers:
+4
+    port_stats_poller:
+8
+        type: 'port_stats'
+8
+        dps: ['windscale-faucet-1']
+8
+        interval: 10
+8
+        db: 'influx'
+4
+    flow_table_poller:
+8
+        type: 'flow_table'
+8
+        dps: ['windscale-faucet-1']
+8
+        interval: 40
+8
+        db: 'couchdb'
+0
+dbs:
+4
+    influx:
+8
+        type: 'influx'
+8
+        influx_db: 'faucet'
+8
+        influx_host: 'localhost'
+8
+        influx_port: 8086
+8
+        influx_user: 'faucet'
+8
+        influx_pwd: ''
+8
+        influx_timeout: 10
+4
+    couchdb:
+8
+        type: gaugedb
+8
+        gdb_type: nosql
+8
+        nosql_db: couch
+8
+        db_username: couch
+8
+        db_password: 123
+8
+        #db_ip: 'localhost'
+8
+        db_ip: '10.10.22.7'
+8
+        db_port: 5984
+8
+        driver: 'couchdb'
+8
+        views:
+12
+            switch_view: '_design/switches/_view/switch'
+12
+            match_view: '_design/flows/_view/match'
+12
+            tag_view: '_design/tags/_view/tags'
+8
+        switches_doc: 'switches_bak'
+8
+        flows_doc: 'flows_bak'
+8
+        db_update_counter: 2
+0
+
+0
+
+faucet_configs:
+    - '/etc/ryu/faucet/faucet.yaml'
+watchers:
+    port_stats_poller:
+        type: 'port_stats'
+        dps: ['windscale-faucet-1']
+        interval: 10
+        db: 'influx'
+    flow_table_poller:
+        type: 'flow_table'
+        dps: ['windscale-faucet-1']
+        interval: 40
+        db: 'couchdb'
+dbs:
+    influx:
+        type: 'influx'
+        influx_db: 'faucet'
+        influx_host: 'localhost'
+        influx_port: 8086
+        influx_user: 'faucet'
+        influx_pwd: ''
+        influx_timeout: 10
+    couchdb:
+        type: gaugedb
+        gdb_type: nosql
+        nosql_db: couch
+        db_username: couch
+        db_password: 123
+        #db_ip: 'localhost'
+        db_ip: '10.10.22.7'
+        db_port: 5984
+        driver: 'couchdb'
+        views:
+            switch_view: '_design/switches/_view/switch'
+            match_view: '_design/flows/_view/match'
+            tag_view: '_design/tags/_view/tags'
+        switches_doc: 'switches_bak'
+        flows_doc: 'flows_bak'
+        db_update_counter: 2
+
+
+faucet_configs:
+    - '/etc/ryu/faucet/faucet.yaml'
+watchers:
+    port_stats_poller:
+        type: 'port_stats'
+        dps: ['windscale-faucet-1']
+        interval: 10
+        db: 'influx'
+    flow_table_poller:
+        type: 'flow_table'
+        dps: ['windscale-faucet-1']
+        interval: 40
+        db: 'couchdb'
+dbs:
+    influx:
+        type: 'influx'
+        influx_db: 'faucet'
+        influx_host: 'localhost'
+        influx_port: 8086
+        influx_user: 'faucet'
+        influx_pwd: ''
+        influx_timeout: 10
+    couchdb:
+        type: gaugedb
+        gdb_type: nosql
+        nosql_db: couch
+        db_username: couch
+        db_password: 123
+        #db_ip: 'localhost'
+        db_ip: '10.10.22.7'
+        db_port: 5984
+        driver: 'couchdb'
+        views:
+            switch_view: '_design/switches/_view/switch'
+            match_view: '_design/flows/_view/match'
+            tag_view: '_design/tags/_view/tags'
+        switches_doc: 'switches_bak'
+        flows_doc: 'flows_bak'
+        db_update_counter: 2
+
+
