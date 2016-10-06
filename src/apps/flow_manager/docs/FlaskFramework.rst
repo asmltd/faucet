@@ -1,7 +1,11 @@
-Faucet Flow Manager UI
+**Faucet Flow Manager UI**
+
 Documentation for Flask Framework
+
 Date: October 4th, 2016
+
 Author: Hariharaselvam Balasubramanian
+
 
 About Flask:
 Flask is a micro web framework written in Python and based on the Werkzeug toolkit and Jinja2 template engine. It is BSD licensed.
@@ -9,9 +13,19 @@ Flask is a micro web framework written in Python and based on the Werkzeug toolk
 Host ip and port number are given at config.py file. Host ip "0.0.0.0" will make the application available on public. Host ip "127.0.0.1" will make the application available only on local machin where the flask deployed.
 Flask default port is 5000.
 
+Install required modules:
+
+    pip install Flask
+
+    pip install functools
+
+    pip install uuid
+
+    pip install requests
+
 How to run:
 
-    python run.py > access.log &
+    python flow_manager_server.py > access.log &
 
 REST API
 
