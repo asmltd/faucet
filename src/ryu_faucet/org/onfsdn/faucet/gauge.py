@@ -13,15 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 import time
 import os
 import signal
-import sys
-
-import logging
-import yaml
-
-from util import kill_on_exception, get_sys_prefix, get_logger
 
 from ryu.base import app_manager
 from ryu.controller import ofp_event
@@ -32,6 +27,7 @@ from ryu.controller.handler import set_ev_cls
 from ryu.ofproto import ofproto_v1_3
 
 from config_parser import watcher_parser
+from util import kill_on_exception, get_sys_prefix, get_logger, dpid_log
 from watcher import watcher_factory
 
 
@@ -87,29 +83,30 @@ class Gauge(app_manager.RyuApp):
 
     @set_ev_cls(dpset.EventDP, dpset.DPSET_EV_DISPATCHER)
     @kill_on_exception(exc_logname)
-    def handler_connect_or_disconnect(self, ev):
-        ryudp = ev.dp
-        if ryudp.id not in self.watchers:
-            self.logger.info("no watcher configured for {0}".format(ryudp.id))
+    def handler_connect_or_disconnect(self, ryu_event):
+        ryu_dp = ryu_event.dp
+        dp_id = ryu_dp.id
+        if dp_id not in self.watchers:
+            self.logger.info('no watcher configured for %s', dpid_log(dp_id))
             return
 
-        if ev.enter: # DP is connecting
-            self.logger.info("datapath up %x", ryudp.id)
-            for watcher in self.watchers[ryudp.id].values():
-                watcher.start(ryudp)
+        if ryu_event.enter: # DP is connecting
+            self.logger.info('%s up', dpid_log(dp_id))
+            for watcher in self.watchers[dp_id].values():
+                watcher.start(ryu_dp)
         else: # DP is disconnecting
-            if ryudp.id in self.watchers:
-                for watcher in self.watchers[ryudp.id].values():
+            if ryu_dp.id in self.watchers:
+                for watcher in self.watchers[dp_id].values():
                     watcher.stop()
-                del self.watchers[ryudp.id]
-            self.logger.info("datapath down %x", ryudp.id)
+                del self.watchers[dp_id]
+            self.logger.info('%s down', dpid_log(dp_id))
 
     def signal_handler(self, sigid, frame):
         if sigid == signal.SIGHUP:
             self.send_event('Gauge', EventGaugeReconfigure())
 
     @set_ev_cls(EventGaugeReconfigure, MAIN_DISPATCHER)
-    def reload_config(self, ev):
+    def reload_config(self, ryu_event):
         self.config_file = os.getenv('GAUGE_CONFIG', self.config_file)
 
         new_confs = watcher_parser(self.config_file, self.logname)
@@ -132,10 +129,11 @@ class Gauge(app_manager.RyuApp):
 
     @set_ev_cls(dpset.EventDPReconnected, dpset.DPSET_EV_DISPATCHER)
     @kill_on_exception(exc_logname)
-    def handler_reconnect(self, ev):
-        self.logger.info("datapath reconnected %x", ev.dp.id)
-        for watcher in self.watchers[ev.dp.id].values():
-            watcher.start(ev.dp)
+    def handler_reconnect(self, ryu_event):
+        ryu_dp = ryu_event.dp
+        self.logger.info('%s reconnected', dpid_log(ryu_dp.id))
+        for watcher in self.watchers[ryu_dp.id].values():
+            watcher.start(ryu_dp)
 
     def update_watcher(self, dp_id, name, msg):
         rcv_time = time.time()
@@ -144,15 +142,15 @@ class Gauge(app_manager.RyuApp):
 
     @set_ev_cls(ofp_event.EventOFPPortStatus, MAIN_DISPATCHER) # pylint: disable=no-member
     @kill_on_exception(exc_logname)
-    def port_status_handler(self, ev):
-        self.update_watcher(ev.msg.datapath.id, 'port_state', ev.msg)
+    def port_status_handler(self, ryu_event):
+        self.update_watcher(ryu_event.msg.datapath.id, 'port_state', ryu_event.msg)
 
     @set_ev_cls(ofp_event.EventOFPPortStatsReply, MAIN_DISPATCHER) # pylint: disable=no-member
     @kill_on_exception(exc_logname)
-    def port_stats_reply_handler(self, ev):
-        self.update_watcher(ev.msg.datapath.id, 'port_stats', ev.msg)
+    def port_stats_reply_handler(self, ryu_event):
+        self.update_watcher(ryu_event.msg.datapath.id, 'port_stats', ryu_event.msg)
 
     @set_ev_cls(ofp_event.EventOFPFlowStatsReply, MAIN_DISPATCHER) # pylint: disable=no-member
     @kill_on_exception(exc_logname)
-    def flow_stats_reply_handler(self, ev):
-        self.update_watcher(ev.msg.datapath.id, 'flow_table', ev.msg)
+    def flow_stats_reply_handler(self, ryu_event):
+        self.update_watcher(ryu_event.msg.datapath.id, 'flow_table', ryu_event.msg)

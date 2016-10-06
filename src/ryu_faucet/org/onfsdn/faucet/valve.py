@@ -1,3 +1,5 @@
+"""Implementation of Valve learning layer 2/3 switch."""
+
 # Copyright (C) 2013 Nippon Telegraph and Telephone Corporation.
 # Copyright (C) 2015 Brad Cowie, Christopher Lorier and Joe Stringer.
 # Copyright (C) 2015 Research and Education Advanced Network New Zealand Ltd.
@@ -72,7 +74,7 @@ class Valve(object):
         self.dp = dp
         self.logger = logging.getLogger(logname + '.valve')
         self.ofchannel_logger = None
-        self.register_table_match_types()
+        self._register_table_match_types()
         # TODO: functional flow managers require too much state.
         # Should interface with a common composer class.
         self.ipv4_route_manager = valve_route.ValveIPv4RouteManager(
@@ -96,7 +98,7 @@ class Valve(object):
             self.valve_in_match, self.valve_flowmod, self.valve_flowdel,
             self.valve_flowdrop)
 
-    def register_table_match_types(self):
+    def _register_table_match_types(self):
         # TODO: functional flow managers should be able to register
         # the flows they need, themselves.
         self.TABLE_MATCH_TYPES = {
@@ -121,7 +123,7 @@ class Valve(object):
                 'in_port', 'vlan_vid', 'eth_dst'),
         }
 
-    def in_port_tables(self):
+    def _in_port_tables(self):
         in_port_tables = [self.dp.acl_table]
         for table_id in self.TABLE_MATCH_TYPES:
             if 'in_port' in self.TABLE_MATCH_TYPES:
@@ -169,14 +171,25 @@ class Valve(object):
         match = valve_of.match(match_dict)
         return match
 
-    def ignore_dpid(self, dp_id):
-        """Ignore all DPIDs except the DPID configured."""
+    def _ignore_dpid(self, dp_id):
+        """Return True if this datapath ID is not ours.
+
+        Args:
+            dp_id (int): datapath ID
+        Returns:
+            bool: True if this datapath ID is not ours.
+        """
         if dp_id != self.dp.dp_id:
-            self.logger.error('Unknown dpid:%s', dp_id)
+            self.logger.error('Unknown %s', util.dpid_log(dp_id))
             return True
         return False
 
-    def all_valve_tables(self):
+    def _all_valve_tables(self):
+        """Return all Valve tables.
+
+        Returns:
+            tuple: all Valve tables as ints.
+        """
         return (
             self.dp.vlan_table,
             self.dp.acl_table,
@@ -242,19 +255,26 @@ class Valve(object):
             inst=[valve_of.apply_actions(
                 [valve_of.output_controller()])] + inst)
 
-    def delete_all_valve_flows(self):
+    def _delete_all_valve_flows(self):
         """Delete all flows from all FAUCET tables."""
         ofmsgs = []
-        for table_id in self.all_valve_tables():
+        for table_id in self._all_valve_tables():
             ofmsgs.extend(self.valve_flowdel(table_id))
         return ofmsgs
 
-    def add_default_drop_flows(self):
+    def _delete_all_port_match_flows(self, port):
+        ofmsgs = []
+        for table in self._in_port_tables():
+            in_port_match = self.valve_in_match(table, in_port=port.number)
+            ofmsgs.extend(self.valve_flowdel(table, in_port_match))
+        return ofmsgs
+
+    def _add_default_drop_flows(self):
         """Add default drop rules on all FAUCET tables."""
 
         # default drop on all tables.
         ofmsgs = []
-        for table in self.all_valve_tables():
+        for table in self._all_valve_tables():
             ofmsgs.append(self.valve_flowdrop(
                 table,
                 priority=self.dp.lowest_priority))
@@ -291,30 +311,30 @@ class Valve(object):
 
         return ofmsgs
 
-    def add_vlan_flood_flow(self):
+    def _add_vlan_flood_flow(self):
         """Add a flow to flood packets for unknown destinations."""
         return [self.valve_flowmod(
             self.dp.eth_dst_table,
             priority=self.dp.low_priority,
             inst=[valve_of.goto_table(self.dp.flood_table)])]
 
-    def add_controller_learn_flow(self):
+    def _add_controller_learn_flow(self):
         """Add a flow for controller to learn/add flows for destinations."""
         return [self.valve_flowcontroller(
             self.dp.eth_src_table,
             priority=self.dp.low_priority,
             inst=[valve_of.goto_table(self.dp.eth_dst_table)])]
 
-    def add_default_flows(self):
+    def _add_default_flows(self):
         """Configure datapath with necessary default tables and rules."""
         ofmsgs = []
-        ofmsgs.extend(self.delete_all_valve_flows())
-        ofmsgs.extend(self.add_default_drop_flows())
-        ofmsgs.extend(self.add_vlan_flood_flow())
-        ofmsgs.extend(self.add_controller_learn_flow())
+        ofmsgs.extend(self._delete_all_valve_flows())
+        ofmsgs.extend(self._add_default_drop_flows())
+        ofmsgs.extend(self._add_vlan_flood_flow())
+        ofmsgs.extend(self._add_controller_learn_flow())
         return ofmsgs
 
-    def add_ports_and_vlans(self, discovered_port_nums):
+    def _add_ports_and_vlans(self, discovered_port_nums):
         """Add all configured and discovered ports and VLANs."""
         ofmsgs = []
         all_port_nums = set()
@@ -324,14 +344,13 @@ class Valve(object):
             self.logger.info('Configuring VLAN %s', vlan)
             for port in vlan.get_ports():
                 all_port_nums.add(port.number)
+            # add mirror destination ports.
+            for port in vlan.mirror_destination_ports():
+                all_port_nums.add(port.number)
             # install eth_dst_table flood ofmsgs
             ofmsgs.extend(self.flood_manager.build_flood_rules(vlan))
             # add controller IPs if configured.
-            ofmsgs.extend(self.add_controller_ips(vlan.controller_ips, vlan))
-
-        # add mirror ports.
-        for port_num in self.dp.mirror_from_port.itervalues():
-            all_port_nums.add(port_num)
+            ofmsgs.extend(self._add_controller_ips(vlan.controller_ips, vlan))
 
         # add any ports discovered but not configured
         for port_num in discovered_port_nums:
@@ -347,44 +366,37 @@ class Valve(object):
         return ofmsgs
 
     def datapath_connect(self, dp_id, discovered_port_nums):
-        """Generate the default openflow msgs for a datapath upon connection.
+        """Handle Ryu datapath connection event and provision pipeline.
 
-        Depending on the implementation, a network state database may be
-        updated.
-
-        Arguments:
-        dp_id -- the Datapath unique ID (64bit int)
-        ports -- a list containing the port numbers of each port on the
-            datapath.
-
+        Args:
+            dp_id (int): datapath ID.
+            discovered_port_nums (list): known datapath ports as ints.
         Returns:
-        A list of flow mod messages that will be sent in order to the datapath
-        in order to configure it."""
-        if self.ignore_dpid(dp_id):
+            list: OpenFlow messages to send to datapath.
+        """
+        if self._ignore_dpid(dp_id):
             return []
         if discovered_port_nums is None:
             discovered_port_nums = []
 
-        self.logger.info('Configuring datapath')
+        self.logger.info('Configuring %s', util.dpid_log(dp_id))
         ofmsgs = []
-        ofmsgs.extend(self.add_default_flows())
-        ofmsgs.extend(self.add_ports_and_vlans(discovered_port_nums))
+        ofmsgs.extend(self._add_default_flows())
+        ofmsgs.extend(self._add_ports_and_vlans(discovered_port_nums))
         self.dp.running = True
         return ofmsgs
 
     def datapath_disconnect(self, dp_id):
-        """Update n/w state db upon disconnection of datapath with id dp_id."""
-        if not self.ignore_dpid(dp_id):
-            self.logger.critical('Datapath disconnected')
-        return []
+        """Handle Ryu datapath disconnection event.
 
-    def datapath_down(self, dp_id):
-        if not self.ignore_dpid(dp_id):
+        Args:
+            dp_id (int): datapath ID.
+        """
+        if not self._ignore_dpid(dp_id):
             self.dp.running = False
-            self.logger.warning('Datapath %s down', dp_id)
-        return []
+            self.logger.warning('%s down', util.dpid_log(dp_id))
 
-    def port_add_acl(self, port_num):
+    def _port_add_acl(self, port_num):
         ofmsgs = []
         forwarding_table = self.dp.eth_src_table
         if port_num in self.dp.acl_in:
@@ -403,7 +415,7 @@ class Valve(object):
                 acl_rule_priority -= 1
         return ofmsgs, forwarding_table
 
-    def port_add_vlan_rules(self, port, vlan, vlan_vid, vlan_inst):
+    def _port_add_vlan_rules(self, port, vlan, vlan_vid, vlan_inst):
         ofmsgs = []
         ofmsgs.append(self.valve_flowmod(
             self.dp.vlan_table,
@@ -414,7 +426,7 @@ class Valve(object):
         ofmsgs.extend(self.flood_manager.build_flood_rules(vlan))
         return ofmsgs
 
-    def port_add_vlan_untagged(self, port, vlan, forwarding_table, mirror_act):
+    def _port_add_vlan_untagged(self, port, vlan, forwarding_table, mirror_act):
         push_vlan_act = mirror_act + valve_of.push_vlan_act(vlan.vid)
         push_vlan_inst = [
             valve_of.apply_actions(push_vlan_act),
@@ -422,17 +434,17 @@ class Valve(object):
         ]
         null_vlan = namedtuple('null_vlan', 'vid')
         null_vlan.vid = ofp.OFPVID_NONE
-        return self.port_add_vlan_rules(port, vlan, null_vlan, push_vlan_inst)
+        return self._port_add_vlan_rules(port, vlan, null_vlan, push_vlan_inst)
 
-    def port_add_vlan_tagged(self, port, vlan, forwarding_table, mirror_act):
+    def _port_add_vlan_tagged(self, port, vlan, forwarding_table, mirror_act):
         vlan_inst = [
             valve_of.goto_table(forwarding_table)
         ]
         if mirror_act:
             vlan_inst = [valve_of.apply_actions(mirror_act)] + vlan_inst
-        return self.port_add_vlan_rules(port, vlan, vlan, vlan_inst)
+        return self._port_add_vlan_rules(port, vlan, vlan, vlan_inst)
 
-    def port_add_vlans(self, port, forwarding_table, mirror_act):
+    def _port_add_vlans(self, port, forwarding_table, mirror_act):
         ofmsgs = []
         vlans = self.dp.vlans.values()
         tagged_vlans_with_port = [
@@ -440,23 +452,23 @@ class Valve(object):
         untagged_vlans_with_port = [
             vlan for vlan in vlans if port in vlan.untagged]
         for vlan in tagged_vlans_with_port:
-            ofmsgs.extend(self.port_add_vlan_tagged(
+            ofmsgs.extend(self._port_add_vlan_tagged(
                 port, vlan, forwarding_table, mirror_act))
         for vlan in untagged_vlans_with_port:
-            ofmsgs.extend(self.port_add_vlan_untagged(
+            ofmsgs.extend(self._port_add_vlan_untagged(
                 port, vlan, forwarding_table, mirror_act))
         return ofmsgs
 
     def port_add(self, dp_id, port_num):
-        """Generate openflow msgs to update the datapath upon addition of port.
+        """Handle the addition of a port.
 
-        Arguments:
-        dp_id -- the unique id of the datapath
-        port_num -- the port number of the new port
-
-        Returns
-        A list of flow mod messages to be sent to the datapath."""
-        if self.ignore_dpid(dp_id) or valve_of.ignore_port(port_num):
+        Args:
+            dp_id (int): datapath ID.
+            port_num (int): port number.
+        Returns:
+            list: OpenFlow messages, if any.
+        """
+        if self._ignore_dpid(dp_id) or valve_of.ignore_port(port_num):
             return []
 
         if port_num not in self.dp.ports:
@@ -471,38 +483,44 @@ class Valve(object):
         if not port.running():
             return []
 
-        in_port_match = self.valve_in_match(
-            self.dp.vlan_table, in_port=port_num)
         ofmsgs = []
         self.logger.info('Sending config for port %s', port)
 
-        for table in self.in_port_tables():
-            ofmsgs.extend(self.valve_flowdel(table, in_port_match))
+        # Delete all flows previously matching this port
+        ofmsgs.extend(self._delete_all_port_match_flows(port))
 
+        # Port is a mirror destination; drop all input packets
         if port.mirror_destination:
-            # this is a mirror port - drop all input packets
             ofmsgs.append(self.valve_flowdrop(
                 self.dp.vlan_table,
-                in_port_match))
+                match=self.valve_in_match(self.dp.vlan_table, in_port=port_num),
+                priority=self.dp.highest_priority))
             return ofmsgs
 
+        # Add ACL if any
+        acl_ofmsgs, forwarding_table = self._port_add_acl(port_num)
+        ofmsgs.extend(acl_ofmsgs)
+
+        # Add mirroring if any
         mirror_act = []
-        # this port is mirrored to another port
         if port.mirror:
             mirror_act = [valve_of.output_port(port.mirror)]
 
-        acl_ofmsgs, forwarding_table = self.port_add_acl(port_num)
-        ofmsgs.extend(acl_ofmsgs)
-        ofmsgs.extend(self.port_add_vlans(port, forwarding_table, mirror_act))
+        # Add port/to VLAN rules.
+        ofmsgs.extend(self._port_add_vlans(port, forwarding_table, mirror_act))
 
         return ofmsgs
 
     def port_delete(self, dp_id, port_num):
-        """Generate openflow msgs to update the datapath upon deletion of port.
+        """Handle the deletion of a port.
 
-        Returns
-        A list of flow mod messages to be sent to the datapath."""
-        if self.ignore_dpid(dp_id) or valve_of.ignore_port(port_num):
+        Args:
+            dp_id (int): datapath ID.
+            port_num (int): port number.
+        Returns:
+            list: OpenFlow messages, if any.
+        """
+        if self._ignore_dpid(dp_id) or valve_of.ignore_port(port_num):
             return []
 
         if port_num not in self.dp.ports:
@@ -516,11 +534,7 @@ class Valve(object):
         ofmsgs = []
 
         if not port.permanent_learn:
-            for table in self.in_port_tables():
-                ofmsgs.extend(self.valve_flowdel(
-                    table,
-                    self.valve_in_match(
-                        table, in_port=port_num)))
+            ofmsgs.extend(self._delete_all_port_match_flows(port))
 
             # delete eth_dst rules
             ofmsgs.extend(self.valve_flowdel(
@@ -535,6 +549,19 @@ class Valve(object):
         return ofmsgs
 
     def control_plane_handler(self, in_port, vlan, eth_src, eth_dst, pkt):
+        """Handle a packet probably destined to FAUCET's route managers.
+
+        For example, next hop resolution or ICMP echo requests.
+
+        Args:
+            in_port (int): port the packet was received on.
+            vlan (vlan): vlan of the port the packet was received on.
+            eth_src (str): source Ethernet MAC address.
+            eth_dst (str): destination Ethernet MAC address.
+            pkt (ryu.lib.packet.ethernet): packet received.
+        Returns:
+            list: OpenFlow messages, if any.
+        """
         if eth_dst == self.FAUCET_MAC or not valve_packet.mac_addr_is_unicast(eth_dst):
             for handler in (self.ipv4_route_manager.control_plane_handler,
                             self.ipv6_route_manager.control_plane_handler):
@@ -543,32 +570,36 @@ class Valve(object):
                     return ofmsgs
         return []
 
-    def known_up_dpid_and_port(self, dp_id, in_port):
-        if (not self.ignore_dpid(dp_id) and not valve_of.ignore_port(in_port) and
+    def _known_up_dpid_and_port(self, dp_id, in_port):
+        """Returns True if datapath and port are known and running.
+
+        Args:
+            dp_id (int): datapath ID.
+            in_port (int): port number.
+        Returns:
+            bool: True if datapath and port are known and running.
+        """
+        if (not self._ignore_dpid(dp_id) and not valve_of.ignore_port(in_port) and
                 self.dp.running and in_port in self.dp.ports):
             return True
         return False
 
     def rcv_packet(self, dp_id, in_port, vlan_vid, pkt):
-        """Generate openflow msgs to update datapath upon receipt of packet.
-        This involves asssociating the ethernet source address of the packet
-        with the given in_port (ethernet switching) ideally so that no packets
-        from this address are sent to the controller, and packets to this
-        address are output to in_port. This may not be fully possible depending
-        on the limitations of the datapath.
+        """Handle a packet from the dataplane (eg to re/learn a host).
 
-        Depending on implementation this may involve updating a nw state db.
+        The packet may be sent to us also in response to FAUCET
+        initiating IPv6 neighbor discovery, or ARP, to resolve
+        a nexthop.
 
-        Arguments:
-        dp_id -- the unique id of the datapath that received the packet (64bit
-            int)
-        in_port -- the port number of the port that received the packet
-        vlan_vid -- the vlan_vid tagged to the packet.
-        pkt -- the packet send to us (Ryu ethernet object).
-
-        Returns
-        A list of flow mod messages to be sent to the datpath."""
-        if not self.known_up_dpid_and_port(dp_id, in_port):
+        Args:
+            dp_id (int): datapath ID.
+            in_port (int): port packet was received on.
+            vlan_vid (int): VLAN VID of port packet was received on.
+            pkt (ryu.lib.packet.packet): packet received.
+        Return:
+            list: OpenFlow messages, if any.
+        """
+        if not self._known_up_dpid_and_port(dp_id, in_port):
             return []
 
         ofmsgs = []
@@ -580,8 +611,8 @@ class Valve(object):
 
         if valve_packet.mac_addr_is_unicast(eth_src):
             self.logger.debug(
-                'Packet_in dp_id: %x src:%s in_port:%d vid:%s',
-                dp_id, eth_src, in_port, vlan_vid)
+                'Packet_in %s src:%s in_port:%d vid:%s',
+                util.dpid_log(dp_id), eth_src, in_port, vlan_vid)
 
             ofmsgs.extend(self.control_plane_handler(
                 in_port, vlan, eth_src, eth_dst, pkt))
@@ -608,6 +639,11 @@ class Valve(object):
         return ofmsgs
 
     def host_expire(self):
+        """Expire hosts not recently re/learned.
+
+        Expire state from the host manager only; the switch does its own flow
+        expiry.
+        """
         if not self.dp.running:
             return
         now = time.time()
@@ -615,10 +651,13 @@ class Valve(object):
             self.host_manager.expire_hosts_from_vlan(vlan, now)
 
     def reload_config(self, new_dp):
-        """Reload the config from new_dp
+        """Reload configuration new_dp
 
-        KW Arguments:
-        new_dp -- A new DP object containing the updated config."""
+        Args:
+            new_dp (DP): new dataplane configuration.
+        Returns:
+            list: OpenFlow messages.
+        """
         # TODO: a reload currently causes a full pipeline restart.
         # We could special case reloads if we need to change only
         # (for example) an ACL on a port.
@@ -629,7 +668,7 @@ class Valve(object):
                 self.dp.dp_id, self.dp.ports.keys())
         return ofmsgs
 
-    def add_controller_ips(self, controller_ips, vlan):
+    def _add_controller_ips(self, controller_ips, vlan):
         ofmsgs = []
         for controller_ip in controller_ips:
             controller_ip_host = ipaddr.IPNetwork(
@@ -656,6 +695,11 @@ class Valve(object):
             return self.ipv4_route_manager.del_route(vlan, ip_dst)
 
     def resolve_gateways(self):
+        """Call route managers to re/resolve gateways.
+
+        Returns:
+            list: OpenFlow messages, if any.
+        """
         if not self.dp.running:
             return []
         ofmsgs = []
@@ -664,6 +708,7 @@ class Valve(object):
             ofmsgs.extend(self.ipv4_route_manager.resolve_gateways(vlan, now))
             ofmsgs.extend(self.ipv6_route_manager.resolve_gateways(vlan, now))
         return ofmsgs
+
 
 class ArubaValve(Valve):
 

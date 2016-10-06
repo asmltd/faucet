@@ -23,7 +23,7 @@
 # * pylint
 # * curl
 
-
+import glob
 import inspect
 import os
 import sys
@@ -82,22 +82,7 @@ EXTERNAL_DEPENDENCIES = (
 FAUCET_DIR = os.getenv('FAUCET_DIR', '../src/ryu_faucet/org/onfsdn/faucet')
 
 # Must pass with 0 lint errors
-# TODO: eliminate existing lint errors so all files can be checked.
-FAUCET_LINT_SRCS = (
-    'config_parser.py',
-    'faucet.py',
-    'gauge.py',
-    'port.py',
-    'util.py',
-    'valve.py',
-    'valve_acl.py',
-    'valve_flood.py',
-    'valve_host.py',
-    'valve_of.py',
-    'valve_packet.py',
-    'valve_route.py',
-    'vlan.py',
-)
+FAUCET_LINT_SRCS = glob.glob(os.path.join(FAUCET_DIR, '*py'))
 
 # Maximum number of parallel tests to run at once
 MAX_PARALLEL_TESTS = 20
@@ -355,6 +340,11 @@ hardware: "%s"
         tcp_pattern = '%s/tcp' % controller.port
         fuser_out = controller.cmd('fuser %s -k -1' % tcp_pattern)
         self.assertTrue(re.search(r'%s:\s+\d+' % tcp_pattern, fuser_out))
+
+    def force_faucet_reload(self):
+        # Force FAUCET to reload by adding new line to config file.
+        open(os.environ['FAUCET_CONFIG'], 'a').write('\n')
+        self.hup_faucet()
 
     def tcpdump_helper(self, tcpdump_host, tcpdump_filter, funcs=[],
                        timeout=10, packets=2):
@@ -693,7 +683,7 @@ vlans:
 """
 
     def test_untagged(self):
-        self.hup_faucet()
+        self.force_faucet_reload()
         self.net.pingAll()
         learned_hosts = [
             host for host in self.net.hosts if self.host_learned(host)]
@@ -705,13 +695,13 @@ class FaucetUntaggedHUPTest(FaucetUntaggedTest):
     def get_configure_count(self):
         controller = self.net.controllers[0]
         configure_count = controller.cmd(
-                'grep -c "Configuring datapath" %s' % os.environ['FAUCET_LOG'])
+            'grep -c "configuration is unchanged" %s' % os.environ['FAUCET_LOG'])
         return configure_count
 
     def test_untagged(self):
         controller = self.net.controllers[0]
         switch = self.net.switches[0]
-        for i in range(1, 4):
+        for i in range(0, 3):
             configure_count = self.get_configure_count()
             self.assertEquals(i, int(configure_count))
             self.hup_faucet()
@@ -1961,8 +1951,7 @@ def check_dependencies():
 
 def lint_check():
     for faucet_src in FAUCET_LINT_SRCS:
-        faucet_src_path = os.path.join(FAUCET_DIR, faucet_src)
-        ret = subprocess.call(['pylint', '-E', faucet_src_path])
+        ret = subprocess.call(['pylint', '-E', faucet_src])
         if ret:
             print 'lint of %s returns an error' % faucet_src
             return False
